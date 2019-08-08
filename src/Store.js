@@ -7,25 +7,23 @@ let movies = [{
 
 export const store = writable({movies});
 
+store.subscribe(({movies: updatedMovies}) => movies = updatedMovies);
 
 export function newMovie (movie) {
     const { movies } = get(store);
-    if (!movies.find(item => item.id === movie)) {
+    let index = -1;
+
+    if (movie && !movies.find(item => item.id === movie)) {
         updateMovies({
             movies: [...movies, {
                 id: movie,
                 watched: false
             }]
         });
+        index = movies.length + 1;
     }
-}
 
-export function markAsWatched (movie) {
-    toggleWatch(movie, true);
-}
-
-export function markAsUnWatched (movie) {
-    toggleWatch(movie, false);
+    return index;
 }
 
 export function removeMovie (id) {
@@ -35,11 +33,14 @@ export function removeMovie (id) {
     });
 }
 
-function toggleWatch (movie, watched) {
-    movies.filter(item => item.id === movie).watched = watched;
-    updateMovies({
-        movies,
-    });
+export function toggleWatch (movieId) {
+    const movie = movies.find(item => item.id === movieId);
+    if (movie) {
+        movie.watched = !movie.watched;
+        updateMovies({
+            movies,
+        });
+    }
 }
 
 function updateMovies ({movies}) {

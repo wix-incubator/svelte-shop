@@ -1,7 +1,6 @@
 <script>
 	import MovieList from './MovieList.svelte';
-	import ListItem from './ListItem.svelte';
-	import { store, newMovie, markAsWatched, markAsUnWatched, removeMovie } from './Store';
+	import { store, newMovie } from './Store';
 
 	let movieName = '';
 	let moviesList = [];
@@ -11,18 +10,9 @@
 	});
 
 	function addMovie () {
-		newMovie(movieName);
-		movieName = '';
-	}
-
-	function onSeenMovie (event) {
-		const {movie} = event.detail;
-		markAsWatched(movie);
-	}
-
-	function onNotSeenMovie (event) {
-		const {movie} = event.detail;
-		markAsUnWatched(movie);
+		if (newMovie(movieName) > -1) {
+			movieName = '';
+		}
 	}
 </script>
 
@@ -48,14 +38,12 @@
 	<div>
 		<MovieList list="{moviesList.filter(movie => !movie.watched)}" let:item={movie}>
 			<span slot="title">Movies to see</span>
-			<ListItem name={movie.id} on:remove={removeMovie} seen={movie.watched} on:visibility={onSeenMovie}></ListItem>
 			<p slot="placeholder">Don't like movies?</p>
 		</MovieList>
 	</div>
 	<div>
 		<MovieList list="{moviesList.filter(movie => movie.watched)}" let:item={movie}>
 			<span slot="title">Movies seen</span>
-			<ListItem name={movie.id} on:remove={removeMovie} seen={movie.watched} on:visibility={onNotSeenMovie}></ListItem>
 			<p slot="placeholder">You got to keep up</p>
 		</MovieList>
 	</div>

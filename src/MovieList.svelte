@@ -2,6 +2,8 @@
     import { flip } from 'svelte/animate';
     import { quintOut } from 'svelte/easing';
     import { crossfade } from 'svelte/transition';
+    import ListItem from './ListItem.svelte';
+    import { toggleWatch, removeMovie } from './Store';
 
     const [send, receive] = crossfade({
         duration: d => Math.sqrt(200 * d),
@@ -18,6 +20,16 @@
     });
 
     export let list = [];
+
+    function onToggleVisibility (event) {
+        const {movie} = event.detail;
+        toggleWatch(movie);
+    }
+
+    function onRemove(event) {
+        const { movie } = event.detail;
+        removeMovie(movie);
+    }
 </script>
 
 <div class="container">
@@ -28,8 +40,9 @@
         {#if list.length}
             <ul>
                 {#each list as movie (movie.id)}
-                    <li in:receive="{{key: movie.id}}" out:send="{{key: movie.id}}" animate:flip>
-                        <slot item={movie}></slot>
+                    <li in:receive="{{key: movie.id}}"
+                        out:send="{{key: movie.id}}" animate:flip>
+                        <ListItem name={movie.id} on:remove={onRemove} seen={movie.watched} on:visibility={onToggleVisibility}></ListItem>
                     </li>
                 {/each}
             </ul>
