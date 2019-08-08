@@ -4,14 +4,23 @@
 
 	let movieName = '';
 	let moviesList = [];
+	let duplicate;
 
 	store.subscribe(({movies}) => {
 		moviesList = movies;
 	});
 
+	$: {
+		movieName;
+		duplicate = '';
+	}
+
 	function addMovie () {
+		duplicate = '';
 		if (newMovie(movieName) > -1) {
 			movieName = '';
+		} else {
+			setTimeout(() => duplicate = movieName.trim());
 		}
 	}
 </script>
@@ -29,6 +38,9 @@
 		margin-right: 30px;
 	}
 
+	span {
+		line-height: 1.5;
+	}
 </style>
 
 <h1>My Watchlist</h1>
@@ -36,15 +48,15 @@
 <button on:click={addMovie}>Add movie to list</button>
 <div class="lists">
 	<div>
-		<MovieList list="{moviesList.filter(movie => !movie.watched)}" let:item={movie}>
+		<MovieList list="{moviesList.filter(movie => !movie.watched)}" bind:duplicate={duplicate}>
 			<span slot="title">Movies to see</span>
-			<p slot="placeholder">Don't like movies?</p>
+			<span slot="placeholder">Don't like movies?</span>
 		</MovieList>
 	</div>
 	<div>
-		<MovieList list="{moviesList.filter(movie => movie.watched)}" let:item={movie}>
+		<MovieList list="{moviesList.filter(movie => movie.watched)}" bind:duplicate={duplicate}>
 			<span slot="title">Movies seen</span>
-			<p slot="placeholder">You got to keep up</p>
+			<span slot="placeholder">You got to keep up</span>
 		</MovieList>
 	</div>
 </div>

@@ -9,14 +9,15 @@ export const store = writable({movies});
 
 store.subscribe(({movies: updatedMovies}) => movies = updatedMovies);
 
-export function newMovie (movie) {
+export function newMovie (movie = '') {
     const { movies } = get(store);
     let index = -1;
+    let id = movie.trim();
 
-    if (movie && !movies.find(item => item.id === movie)) {
+    if (id && !movies.find(item => item.id === id)) {
         updateMovies({
             movies: [...movies, {
-                id: movie,
+                id,
                 watched: false
             }]
         });
