@@ -1,4 +1,22 @@
 <script>
+    import { flip } from 'svelte/animate';
+    import { quintOut } from 'svelte/easing';
+    import { crossfade } from 'svelte/transition';
+
+    const [send, receive] = crossfade({
+        duration: d => Math.sqrt(200 * d),
+        fallback() {
+            return {
+                duration: 200,
+                easing: quintOut,
+                css: t => `
+					opacity: ${t};
+					transform: scale(${t})
+				`
+            };
+        }
+    });
+
     export let list = [];
 </script>
 
@@ -6,17 +24,19 @@
     <h2>
         <slot name="title"></slot>
     </h2>
-    <ul>
+    <div class="listwrapper">
         {#if list.length}
-            {#each list as movie}
-                <li>
-                    <slot item={movie}></slot>
-                </li>
-            {/each}
+            <ul>
+                {#each list as movie (movie.id)}
+                    <li in:receive="{{key: movie.id}}" out:send="{{key: movie.id}}" animate:flip>
+                        <slot item={movie}></slot>
+                    </li>
+                {/each}
+            </ul>
         {:else}
             <slot name="placeholder"></slot>
         {/if}
-    </ul>
+    </div>
 </div>
 
 <style>
@@ -33,13 +53,17 @@
         margin-bottom: 24px;
     }
 
-    ul {
+    .listwrapper {
         width: 230px;
         padding: 20px;
-        margin: 0;
-        list-style: none;
         background-color: rgba(207, 208, 231, 0.3);
         border-radius: 3px;
+    }
+
+    ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
     }
 
     li {
